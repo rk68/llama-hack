@@ -1,51 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import VoiceRecorder from './VoiceRecorder';
+import './App.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const App = () => {
-    const [insights, setInsights] = useState(null);  // To store transcription
-    const [numPauses, setNumPauses] = useState(null);  // To store the number of pauses
-    const [pauseLengths, setPauseLengths] = useState(null);  // To store the lengths of pauses
-    const [emotionInfo, setEmotionInfo] = useState(null);  // To store emotion information
-    const [topicAnalysis, setTopicAnalysis] = useState(null);  // To store topic analysis
-    const [isRecording, setIsRecording] = useState(false);  // To track if recording is in progress
+    const [insights, setInsights] = useState(null);
+    const [numPauses, setNumPauses] = useState(null);
+    const [pauseLengths, setPauseLengths] = useState(null);
+    const [emotionInfo, setEmotionInfo] = useState(null);
+    const [topicAnalysis, setTopicAnalysis] = useState(null);
+    const [pitchInfo, setPitchInfo] = useState(null);
+    const [wpmInfo, setWpmInfo] = useState(null);
+    const [isRecording, setIsRecording] = useState(false);
 
-    // Handle the completion of the recording
     const handleRecordingComplete = (audioBlob) => {
         const formData = new FormData();
-        formData.append('audio', audioBlob, 'recording.wav'); // Assuming WAV file
+        formData.append('audio', audioBlob, 'recording.wav');
 
-        // Send the audio file to Flask backend for transcription, pause detection, and emotion analysis
         fetch('http://localhost:5000/transcribe', {
             method: 'POST',
             body: formData,
         })
-        .then((response) => response.json())  // Get the JSON response
-        .then((data) => {
-            console.log(data); // Add a console log to inspect the returned data
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data); // Debugging log
 
-            if (data.transcription) {
-                setInsights(data.transcription);  // Set transcription text
-            } else {
-                console.error('Error: No transcription found in response.');
-            }
-
-            if (data.pause_info && data.pause_info.num_pauses !== undefined) {
-                setNumPauses(data.pause_info.num_pauses);  // Set the number of pauses
-            }
-
-            if (data.pause_info && data.pause_info.pause_lengths) {
-                setPauseLengths(data.pause_info.pause_lengths);  // Set the pause lengths
-            }
-
-            if (data.emotion_info) {
-                setEmotionInfo(data.emotion_info);  // Set the emotion info
-            }
-
-            if (data.topic_analysis) {
-                setTopicAnalysis(data.topic_analysis);  // Set the topic analysis
-            }
-        })
-        .catch((error) => console.error('Error during transcription and emotion analysis:', error));
+                if (data.transcription) setInsights(data.transcription);
+                if (data.filler_info) console.log('Filler info:', data.filler_info);
+                if (data.wpm_info) setWpmInfo(data.wpm_info);
+                if (data.num_pauses !== undefined) setNumPauses(data.num_pauses);
+                if (data.pause_lengths) setPauseLengths(data.pause_lengths);
+                if (data.emotion_info) setEmotionInfo(data.emotion_info);
+                if (data.topic_analysis) setTopicAnalysis(data.topic_analysis);
+                if (data.pitch_info) setPitchInfo(data.pitch_info);
+            })
+            .catch((error) => console.error('Error during analysis:', error));
     };
 
     return (
@@ -56,17 +45,17 @@ const App = () => {
 
             <div className="microphone-container">
                 <VoiceRecorder
-                    onRecordingComplete={handleRecordingComplete} // Pass the callback to handle the completion
-                    setIsRecording={setIsRecording} // Pass the setter to track recording state
-                    isRecording={isRecording} // Check if the recording is in progress
+                    onRecordingComplete={handleRecordingComplete}
+                    setIsRecording={setIsRecording}
+                    isRecording={isRecording}
                 />
-                <p>Click the microphone to start recording</p>
+                <p>{isRecording ? "Recording in progress..." : "Click the button to start recording"}</p>
             </div>
 
             {insights && (
                 <div className="metrics-container">
                     <h2>Transcription</h2>
-                    <pre>{insights}</pre> {/* Display transcription */}
+                    <pre>{insights}</pre>
                 </div>
             )}
 
@@ -79,7 +68,7 @@ const App = () => {
             {pauseLengths && (
                 <div className="metrics-container">
                     <h2>Pause Lengths (in seconds)</h2>
-                    <pre>{JSON.stringify(pauseLengths, null, 2)}</pre> {/* Display pause lengths */}
+                    <pre>{JSON.stringify(pauseLengths, null, 2)}</pre>
                 </div>
             )}
 
@@ -91,10 +80,26 @@ const App = () => {
                 </div>
             )}
 
+            {wpmInfo && (
+                <div className="metrics-container">
+                    <h2>Words Per Minute (WPM)</h2>
+                    <p><strong>WPM: </strong>{wpmInfo.wpm}</p>
+                    <p><strong>Total Words: </strong>{wpmInfo.total_words}</p>
+                    <p><strong>Duration (seconds): </strong>{wpmInfo.duration_seconds}</p>
+                </div>
+            )}
+
+            {pitchInfo && (
+                <div className="metrics-container">
+                    <h2>Pitch Analysis</h2>
+                    <pre>{JSON.stringify(pitchInfo, null, 2)}</pre>
+                </div>
+            )}
+
             {topicAnalysis && (
                 <div className="metrics-container">
                     <h2>Topic Analysis</h2>
-                    <pre>{topicAnalysis}</pre> {/* Display topic analysis */}
+                    <pre>{topicAnalysis}</pre>
                 </div>
             )}
         </div>

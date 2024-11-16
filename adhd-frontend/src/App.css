@@ -5,14 +5,10 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(
-    to bottom left, 
-    #add8e6,   /* Light blue in the top right corner */
-    #f9c1d9,   /* Pinkish near the middle */
-    #ffffff    /* White in the bottom left corner */
-  );
-  color: white;
+  background: linear-gradient(to bottom left, #f9c1d9, #add8e6);
+  color: #000; /* Changed text to black */
   font-family: 'Arial', sans-serif;
+  padding: 20px;
 }
 
 .prompt-container {
@@ -35,52 +31,45 @@
   margin-top: 30px;
 }
 
-.microphone-box {
+.microphone-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #fff;
-  border-radius: 50%;
-  padding: 20px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.microphone-box:hover {
-  transform: scale(1.2);
-}
-
-.stop-button {
-  background-color: #ff4c4c;
+  background-color: #4F86F7; /* Blue button */
   border: none;
   border-radius: 50%;
-  padding: 20px;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Added shadow */
 }
 
-.start-button {
-  background-color: #4F86F7;
-  border: none;
-  border-radius: 50%;
-  padding: 20px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+.microphone-button:hover {
+  transform: scale(1.1); /* Slight scaling on hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+}
+
+.microphone-button i {
+  font-size: 2rem;
+  color: white;
 }
 
 .metrics-container {
   margin-top: 30px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 8px;
   width: 80%;
   max-width: 600px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #333;
 }
 
 .metrics-container h2 {
-  color: #f4a300;
+  color: #f76c6c;
   margin-bottom: 10px;
+  font-size: 1.5rem;
 }
 
 .metrics-container pre {
@@ -91,4 +80,64 @@
   font-size: 0.9rem;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+p {
+  color: #000; /* Changed paragraph text to black */
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+button {
+  outline: none;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.recording-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.microphone-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-button, .stop-button {
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
+}
+
+.start-button:hover, .stop-button:hover {
+  transform: scale(1.1); /* Slight scaling on hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+}
+
+.start-button {
+  background-color: #4F86F7; /* Blue for start */
+}
+
+.stop-button {
+  background-color: #FF4C4C; /* Red for stop */
+}
+
+.start-button svg, .stop-button svg {
+  color: white;
 }

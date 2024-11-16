@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { FaMicrophone, FaStop } from 'react-icons/fa';
 import RecordRTC from 'recordrtc';
 
