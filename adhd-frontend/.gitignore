@@ -22,3 +22,34 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# .gitignore
+.env
+
+
+# Ignore Python virtual environment and site-packages
+adhd/bin/
+adhd/lib/python3.11/site-packages/
+
+# Ignore package-lock.json if not needed for commits
+adhd-frontend/package-lock.json
+
+# Ignore wav2vec2 checkpoints
+wav2vec2_checkpoints/
+
+# Ignore other specific files or directories as needed
+adhd/share/
+
+
+# Ignore all .pyc files
+*.pyc
+
+# Ignore __pycache__ directories
+__pycache__/
+
+# Ignore logs
+*.log
+
+# Ignore DS_Store (macOS-specific)
+.DS_Store

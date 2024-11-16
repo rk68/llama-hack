@@ -1,48 +1,57 @@
-// src/VoiceRecorder.js
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { FaMicrophone, FaStop } from 'react-icons/fa';
 import RecordRTC from 'recordrtc';
 
-const VoiceRecorder = ({ onRecordingComplete }) => {
-    const [recording, setRecording] = useState(false);
-    const [audioURL, setAudioURL] = useState(null);
+const VoiceRecorder = ({ onRecordingComplete, setIsRecording, isRecording }) => {
     const recorderRef = useRef(null);
+    const [audioURL, setAudioURL] = useState(null);
+
+    useEffect(() => {
+        return () => {
+            if (recorderRef.current) {
+                recorderRef.current.destroy();
+            }
+        };
+    }, []);
 
     const startRecording = () => {
-        setRecording(true);
-
-        // Start recording with RecordRTC
+        setIsRecording(true);
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream) => {
                 recorderRef.current = new RecordRTC(stream, { type: 'audio' });
                 recorderRef.current.startRecording();
             })
-            .catch((error) => {
-                console.error('Error accessing microphone:', error);
-            });
+            .catch((error) => console.error('Error accessing microphone:', error));
     };
 
     const stopRecording = () => {
-        setRecording(false);
+        setIsRecording(false);
         recorderRef.current.stopRecording(() => {
             const audioBlob = recorderRef.current.getBlob();
             const audioURL = URL.createObjectURL(audioBlob);
             setAudioURL(audioURL);
-            onRecordingComplete(audioBlob); // Pass audio blob to parent component
+            onRecordingComplete(audioBlob);
         });
     };
 
     return (
-        <div>
-            <h2>Record Your Voice</h2>
-            <div>
-                <button onClick={startRecording} disabled={recording}>
-                    Start Recording
-                </button>
-                <button onClick={stopRecording} disabled={!recording}>
-                    Stop Recording
-                </button>
+        <div className="recording-container">
+            <div className="microphone-box">
+                {isRecording ? (
+                    <button className="stop-button" onClick={stopRecording}>
+                        <FaStop size={50} color="red" />
+                    </button>
+                ) : (
+                    <button className="start-button" onClick={startRecording}>
+                        <FaMicrophone size={50} color="#4F86F7" />
+                    </button>
+                )}
             </div>
-            {audioURL && <audio src={audioURL} controls />}
+            {audioURL && (
+                <div className="audio-preview">
+                    <audio src={audioURL} controls />
+                </div>
+            )}
         </div>
     );
 };
