@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { FaMicrophone, FaStop } from 'react-icons/fa';
 import RecordRTC from 'recordrtc';
+import './VoiceRecorder.css'; // Import the CSS file
 
 const VoiceRecorder = ({ onRecordingComplete, setIsRecording, isRecording }) => {
     const recorderRef = useRef(null);
@@ -39,11 +40,12 @@ const VoiceRecorder = ({ onRecordingComplete, setIsRecording, isRecording }) => 
             <div className="microphone-box">
                 {isRecording ? (
                     <button className="stop-button" onClick={stopRecording}>
-                        <FaStop size={50} color="red" />
+                        <FaStop />
+                        Stop Recording
                     </button>
                 ) : (
                     <button className="start-button" onClick={startRecording}>
-                        <FaMicrophone size={50} color="#4F86F7" />
+                        <FaMicrophone />
                     </button>
                 )}
             </div>

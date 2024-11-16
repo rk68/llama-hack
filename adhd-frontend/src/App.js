@@ -13,6 +13,14 @@ const App = () => {
     const [wpmInfo, setWpmInfo] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
 
+
+    const dummyChats = [
+      { date: '2024-11-15', summary: 'Talked about weekend plans and activities.' },
+      { date: '2024-11-14', summary: 'Discussed progress on personal goals and challenges.' },
+      { date: '2024-11-13', summary: 'Analyzed a recent project and its outcomes.' },
+      { date: '2024-11-12', summary: 'Reviewed notes from a previous meeting.' },
+  ];
+
     const handleRecordingComplete = (audioBlob) => {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'recording.wav');
@@ -40,7 +48,7 @@ const App = () => {
     return (
         <div className="main-container">
             <div className="prompt-container">
-                <h1 className="prompt-text">How have you been feeling today? Please record your thoughts.</h1>
+                <h1 className="prompt-text">How was your day?</h1>
             </div>
 
             <div className="microphone-container">
@@ -102,7 +110,28 @@ const App = () => {
                     <pre>{topicAnalysis}</pre>
                 </div>
             )}
+
+            <div className="chat-history">
+                <h2>Previous Chats</h2>
+                <div className="chat-boxes">
+                    {dummyChats.map((chat, index) => (
+                        <div key={index} className="chat-box">
+                            <p className="chat-date">{chat.date}</p>
+                            <p className="chat-summary">{chat.summary}</p>
+                            <div className="chat-buttons">
+                                <button className="chat-button">Results</button>
+                                <button className="chat-button">Transcript</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+
+
         </div>
+
+
     );
 };
 

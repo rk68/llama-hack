@@ -1,26 +1,36 @@
 /* App.css */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Set the height of html and body to 100% */
+}
+
+
 .main-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(to bottom left, #f9c1d9, #add8e6);
-  color: #000; /* Changed text to black */
+  justify-content: flex-start; /* Align content to the top */
+  min-height: 100vh; /* Use min-height instead of height */
+  background: linear-gradient(to bottom left, #ead2dd, #ebc9ff, #e7f7fc);
+  color: #000;
   font-family: 'Arial', sans-serif;
-  padding: 20px;
+  padding: 50px 20px; /* Padding for spacing */
+  box-sizing: border-box; /* Ensure padding doesn't affect layout */
 }
 
 .prompt-container {
   text-align: center;
+  margin-top: 50px; /* Add margin at the top of the prompt */
   margin-bottom: 20px;
 }
 
 .prompt-text {
-  font-size: 2.5rem;
+  font-size: 5.5rem;
   font-weight: bold;
   margin-bottom: 20px;
-  line-height: 1.4;
+  margin-top: 5rem;
+  line-height: 0.95; /* Reduced line spacing */
 }
 
 .microphone-container {
@@ -139,5 +149,75 @@ button:hover {
 }
 
 .start-button svg, .stop-button svg {
+  color: rgb(0, 0, 0);
+}
+
+.chat-history {
+  margin-bottom: 40px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.chat-history h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.chat-box {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.chat-date {
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.chat-summary {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.chat-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.chat-button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
   color: white;
+  background-color: #4f86f7;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.chat-button:hover {
+  background-color: #3b6cd1;
+}
+
+
+.chat-summary {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.4;
 }

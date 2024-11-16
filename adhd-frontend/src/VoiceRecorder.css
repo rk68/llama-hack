@@ -1,0 +1,51 @@
+/* VoiceRecorder.css */
+.recording-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recording-container .start-button,
+.recording-container .stop-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 15px;
+    padding: 10px 40px; /* Increased horizontal padding for width */
+    width: 200px; /* Explicitly set a wider width */
+    height:50px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: none; /* Remove shadow explicitly */
+}
+
+
+.recording-container .start-button svg {
+    margin-right: 10px; /* Add spacing between the icon and text */
+    font-size: 20px; /* Adjust size */
+    color: black; /* Ensure the icon color is visible */
+}
+
+
+.microphone-box {
+    margin: 20px 0;
+}
+
+
+
+.start-button:hover, .stop-button:hover {
+    background-color: #f0f0f0;
+    box-shadow: none; /* Ensure no shadow on hover */
+}
+
+.start-button svg, .stop-button svg {
+    margin-right: 10px;
+}
+
+.audio-preview {
+    margin-top: 20px;
+    text-align: center;
+}
