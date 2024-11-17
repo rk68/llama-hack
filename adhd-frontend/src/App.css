@@ -210,6 +210,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 20px; /* Increase vertical spacing */
 }
 
 .chat-box:hover {
@@ -239,15 +240,16 @@ button:hover {
   padding: 8px 16px;
   font-size: 0.9rem;
   color: white;
-  background-color: #4f86f7;
+  background-color: #6a5acd; /* Purple button */
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .chat-button:hover {
-  background-color: #3b6cd1;
+  background-color: #5a4bcf; /* Slightly darker purple on hover */
+  transform: scale(1.05); /* Add a slight scale effect on hover */
 }
 
 
@@ -270,4 +272,50 @@ button:hover {
 
 .category-box strong {
   font-weight: bold; /* Ensure bold text is prominent */
+}
+
+/* Emotion Container */
+.emotion-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 30px 0;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 600px;
+  color: #333;
+}
+
+/* Top Emotion */
+.top-emotion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.top-emotion .emoji {
+  font-size: 2.5rem;
+}
+
+.top-emotion .emotion-name {
+  text-transform: capitalize;
+}
+
+.top-emotion .probability {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Bar Chart */
+.emotion-bar-chart {
+  width: 100%;
+  max-width: 500px;
 }
