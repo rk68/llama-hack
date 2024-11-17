@@ -50,6 +50,10 @@ const App = () => {
   const [recordings, setRecordings] = useState([]);
   const [expandedBoxes, setExpandedBoxes] = useState({}); // Track expanded boxes
   const [emotionProbabilities, setEmotionProbabilities] = useState(null);
+  const [wpmData, setWpmData] = useState({
+    labels: [], // Labels for chart (e.g., "Recording 1", "Recording 2")
+    wpm: [], // Words Per Minute data points
+  });
 
   const emotionEmojis = {
     happy: '\u{1F60A}', // 😊
@@ -270,21 +274,47 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetch('http://localhost:5000/recordings')
+    fetch('http://localhost:5000/recordings') // Replace with the path to load your JSON
         .then((response) => response.json())
         .then((data) => {
-            setRecordings(data);
+            if (data && data.length > 0) {
+                // Map data to chartData
+                const labels = data.map((recording, index) => `Recording ${index + 1}`);
+                const wpm = data.map((recording) => recording.details.wpm_info.wpm || 0);
 
-            // Populate chart data from stored recordings
-            const labels = data.map((recording) => recording.date);
-            const fillerWords = data.map((recording) => recording.chart_data.filler_count || 0);
-            const pauses = data.map((recording) => recording.chart_data.num_pauses || 0);
-            const wpm = data.map((recording) => recording.chart_data.wpm || 0);
+                // Update chartData specifically for WPM chart
+                setChartData((prev) => ({
+                    ...prev,
+                    labels,
+                    wpm,
+                }));
 
-            setChartData({ labels, fillerWords, pauses, wpm });
+                // Optionally update other chart data if needed
+                const fillerWords = data.map((recording) => recording.chart_data.filler_count || 0);
+                const pauses = data.map((recording) => recording.chart_data.num_pauses || 0);
+
+                setChartData((prev) => ({
+                    ...prev,
+                    fillerWords,
+                    pauses,
+                }));
+            }
         })
         .catch((error) => console.error('Error fetching recordings:', error));
 }, []);
+
+
+
+  const handleNewRecording = (newRecording) => {
+    const { date, details } = newRecording;
+
+    setChartData((prev) => ({
+        ...prev,
+        labels: [...prev.labels, `Recording ${prev.labels.length + 1}`], // Add new label
+        wpm: [...prev.wpm, details.wpm_info.wpm || 0], // Add new WPM value
+    }));
+  };
+
 
 
   const formatTextAsHTML = (text) => {
@@ -381,6 +411,40 @@ const App = () => {
                 )}
                 <div className="emotion-bar-chart">{renderEmotionBarChart()}</div>
             </div>
+
+            <div className="metrics-container">
+              <h2>Words Per Minute (WPM) Progress</h2>
+              {chartData.wpm.length === 0 ? (
+                  <p>No recordings yet. Start recording to see your progress!</p>
+              ) : (
+                  <Line
+                      data={{
+                          labels: chartData.labels,
+                          datasets: [
+                              {
+                                  label: 'Words Per Minute (WPM)',
+                                  data: chartData.wpm,
+                                  borderColor: 'green',
+                                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                  tension: 0.3,
+                              },
+                          ],
+                      }}
+                      options={{
+                          responsive: true,
+                          plugins: {
+                              legend: { position: 'top' },
+                              title: { display: true, text: 'WPM Progress Over Time' },
+                          },
+                          scales: {
+                              x: { title: { display: true, text: 'Recordings' } },
+                              y: { title: { display: true, text: 'WPM' } },
+                          },
+                      }}
+                  />
+              )}
+          </div>
+
 
             <div className="metrics-container">
                 <h2>Pitch Analysis Graph</h2>
