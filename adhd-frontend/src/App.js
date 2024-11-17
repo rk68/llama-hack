@@ -49,14 +49,45 @@ const App = () => {
   const [graphData, setGraphData] = useState(null);
   const [recordings, setRecordings] = useState([]);
   const [expandedBoxes, setExpandedBoxes] = useState({}); // Track expanded boxes
-  const [emotionProbabilities, setEmotionProbabilities] = useState(null); // All emotion probabilities
+  const [emotionProbabilities, setEmotionProbabilities] = useState(null);
 
   const emotionEmojis = {
-      happy: '\u{1F60A}', // 😊 Smiling face
-      sad: '\u{1F622}', // 😢 Crying face
-      angry: '\u{1F621}', // 😡 Angry face
-      neutral: '\u{1F610}', // 😐 Neutral face
+    happy: '\u{1F60A}', // 😊
+    sad: '\u{1F622}',   // 😢
+    angry: '\u{1F621}', // 😡
+    neutral: '\u{1F610}', // 😐
   };
+
+
+  const mapEmotionsToEmoji = (probabilities) => {
+    const emotions = ['happy', 'sad', 'angry', 'neutral'];
+
+
+    // Map each emotion to its probability and emoji
+    const emotionMapping = emotions.reduce((acc, emotion, index) => {
+        acc[emotion] = {
+            emoji: emotionEmojis[emotion],
+            probability: probabilities[index],
+        };
+        return acc;
+    }, {});
+
+    // Find the emotion with the highest probability
+    const topEmotion = Object.keys(emotionMapping).reduce((a, b) =>
+        emotionMapping[a].probability > emotionMapping[b].probability ? a : b
+    );
+
+    return { topEmotion, emotionMapping };
+};
+
+
+  const [chartData, setChartData] = useState({
+    labels: [],
+    fillerWords: [],
+    pauses: [],
+    wpm: [],
+  });
+
 
   const toggleBox = (index) => {
       setExpandedBoxes((prev) => ({
@@ -66,90 +97,127 @@ const App = () => {
   };
 
   const handleRecordingComplete = (audioBlob) => {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.wav');
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.wav');
 
-      fetch('http://localhost:5000/transcribe', {
-          method: 'POST',
-          body: formData,
-      })
-          .then((response) => response.json())
-          .then((data) => {
-              console.log(data); // Debugging log
-              if (data.transcription) setInsights(data.transcription);
-              if (data.filler_info) setFillerInfo(data.filler_info);
-              if (data.wpm_info) setWpmInfo(data.wpm_info);
-              if (data.pause_info) {
-                  setNumPauses(data.pause_info.num_pauses);
-                  setPauseLengths(data.pause_info.pause_lengths);
-              }
-              if (data.emotion_info) setEmotionInfo(data.emotion_info);
-              if (data.topic_analysis) setTopicAnalysis(data.topic_analysis);
-              if (data.pitch_info) setPitchInfo(data.pitch_info);
-              if (data.categories) {
-                  setInattentionData(data.categories.Inattention);
-                  setHyperactivityData(data.categories.Hyperactivity);
-                  setImpulsivityData(data.categories.Impulsivity);
-              }
-              if (data.graph_data) setGraphData(data.graph_data);
+    fetch('http://localhost:5000/transcribe', {
+        method: 'POST',
+        body: formData,
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data); // Debugging log
+            if (data.transcription) setInsights(data.transcription);
+            if (data.filler_info) setFillerInfo(data.filler_info);
+            if (data.wpm_info) setWpmInfo(data.wpm_info);
+            if (data.pause_info) {
+                setNumPauses(data.pause_info.num_pauses);
+                setPauseLengths(data.pause_info.pause_lengths);
+            }
+            if (data.emotion_info) {
+                const { topEmotion, emotionMapping } = mapEmotionsToEmoji(data.emotion_info.probability);
+                setEmotionInfo({ emotion: topEmotion, probability: emotionMapping[topEmotion].probability });
+                setEmotionProbabilities(emotionMapping);
+            }
+            if (data.topic_analysis) setTopicAnalysis(data.topic_analysis);
+            if (data.pitch_info) setPitchInfo(data.pitch_info);
+            if (data.categories) {
+                setInattentionData(data.categories.Inattention);
+                setHyperactivityData(data.categories.Hyperactivity);
+                setImpulsivityData(data.categories.Impulsivity);
+            }
+            if (data.graph_data) setGraphData(data.graph_data);
 
-              // Fetch updated recordings list
-              return fetch('http://localhost:5000/recordings');
-          })
-          .then((response) => response.json())
-          .then((updatedRecordings) => setRecordings(updatedRecordings)) // Update the recordings state
-          .catch((error) => console.error('Error during analysis or fetching recordings:', error));
+            // Fetch updated recordings list
+            return fetch('http://localhost:5000/recordings');
+        })
+        .then((response) => response.json())
+        .then((updatedRecordings) => setRecordings(updatedRecordings)) // Update recordings state
+        .catch((error) => console.error('Error during analysis or fetching recordings:', error));
+};
+
+
+
+  const renderProgressChart = () => {
+    // Check if there is no data to display
+    if (chartData.labels.length === 0) return <p>No data available yet.</p>;
+
+    const data = {
+        labels: chartData.labels,
+        datasets: [
+            {
+                label: 'Filler Words',
+                data: chartData.fillerWords,
+                borderColor: 'red',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                tension: 0.3,
+            },
+            {
+                label: 'Number of Pauses',
+                data: chartData.pauses,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.3,
+            },
+            {
+                label: 'Words Per Minute (WPM)',
+                data: chartData.wpm,
+                borderColor: 'green',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3,
+            },
+        ],
+    };
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: 'Progress Over Time' },
+        },
+        scales: {
+            x: { title: { display: true, text: 'Recordings' } },
+            y: { title: { display: true, text: 'Count / Rate' } },
+        },
+    };
+
+    return <Line data={data} options={options} />;
   };
+
 
   const renderEmotionBarChart = () => {
-      if (!emotionProbabilities) return null;
+    if (!emotionProbabilities) return null;
 
-      const labels = Object.keys(emotionProbabilities);
-      const data = Object.values(emotionProbabilities);
+    const labels = Object.keys(emotionProbabilities);
+    const data = labels.map((label) => emotionProbabilities[label].probability);
 
-      const chartData = {
-          labels: labels.map((label) => `${emotionEmojis[label]} ${label}`), // Include emojis with labels
-          datasets: [
-              {
-                  label: 'Emotion Probabilities',
-                  data: data,
-                  backgroundColor: ['#ffdd57', '#57b6ff', '#ff5757', '#a9a9a9'], // Colors for bars
-                  borderWidth: 1,
-              },
-          ],
-      };
+    const chartData = {
+        labels: labels.map((label) => `${emotionProbabilities[label].emoji} ${label}`), // Include emojis with labels
+        datasets: [
+            {
+                label: 'Emotion Probabilities',
+                data: data,
+                backgroundColor: ['#ffdd57', '#57b6ff', '#ff5757', '#a9a9a9'], // Colors for bars
+                borderWidth: 1,
+            },
+        ],
+    };
 
-      const options = {
-          responsive: true,
-          plugins: {
-              legend: {
-                  display: false,
-              },
-              title: {
-                  display: true,
-                  text: 'Emotion Probabilities',
-              },
-          },
-          scales: {
-              x: {
-                  title: {
-                      display: true,
-                      text: 'Emotions',
-                  },
-              },
-              y: {
-                  title: {
-                      display: true,
-                      text: 'Probability',
-                  },
-                  min: 0,
-                  max: 1,
-              },
-          },
-      };
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Emotion Probabilities' },
+        },
+        scales: {
+            x: { title: { display: true, text: 'Emotions' } },
+            y: { title: { display: true, text: 'Probability' }, min: 0, max: 1 },
+        },
+    };
 
-      return <Bar data={chartData} options={options} />;
-  };
+    return <Bar data={chartData} options={options} />;
+};
+
 
   const renderPitchGraph = () => {
       if (!graphData) return null;
@@ -202,14 +270,22 @@ const App = () => {
   };
 
   useEffect(() => {
-      fetch('http://localhost:5000/recordings')
-          .then((response) => response.json())
-          .then((data) => {
-              console.log('Initial recordings:', data); // Debug log
-              setRecordings(data);
-          })
-          .catch((error) => console.error('Error fetching recordings:', error));
-  }, []);
+    fetch('http://localhost:5000/recordings')
+        .then((response) => response.json())
+        .then((data) => {
+            setRecordings(data);
+
+            // Populate chart data from stored recordings
+            const labels = data.map((recording) => recording.date);
+            const fillerWords = data.map((recording) => recording.chart_data.filler_count || 0);
+            const pauses = data.map((recording) => recording.chart_data.num_pauses || 0);
+            const wpm = data.map((recording) => recording.chart_data.wpm || 0);
+
+            setChartData({ labels, fillerWords, pauses, wpm });
+        })
+        .catch((error) => console.error('Error fetching recordings:', error));
+}, []);
+
 
   const formatTextAsHTML = (text) => {
       if (!text) return '';
@@ -310,6 +386,12 @@ const App = () => {
                 <h2>Pitch Analysis Graph</h2>
                 {renderPitchGraph()}
             </div>
+
+            <div className="metrics-container">
+                <h2>Your Progress</h2>
+                {renderProgressChart()}
+            </div>
+
 
             {graphData && (
                 <div className="metrics-container">
